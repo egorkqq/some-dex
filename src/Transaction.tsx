@@ -1,4 +1,11 @@
-import { useAccount, useConnect, useDisconnect, ConnectorNotFoundError, UserRejectedRequestError } from "wagmi";
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  ConnectorNotFoundError,
+  UserRejectedRequestError,
+  useSendTransaction,
+} from "wagmi";
 
 import { useCallback } from "react";
 
@@ -6,20 +13,36 @@ const Transaction = ({ transaction }: { transaction?: any }) => {
   const { login } = useAuth();
   const { address, isConnected } = useAccount();
 
+  const { data, isLoading, isSuccess, sendTransaction } = useSendTransaction({
+    mode: "recklesslyUnprepared",
+    request: {
+      from: address || "",
+      to: transaction?.to || "",
+      data: transaction?.data || "",
+      value: transaction?.value || "",
+    },
+  });
+
   return (
     <div>
       {!isConnected && (
         <>
           <h3>👮🏻‍♂️ Login: </h3>
-          <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
+          <div
+            style={{ display: "flex", justifyContent: "center", gap: "20px" }}
+          >
             {connectors.map((item) => (
-              <button key={item.connectorId} onClick={() => login(item.connectorId)}>
+              <button
+                key={item.connectorId}
+                onClick={() => login(item.connectorId)}
+              >
                 {item.title}
               </button>
             ))}
           </div>
         </>
       )}
+
       {isConnected && !transaction && (
         <div style={{ textAlign: "left" }}>
           <p> Logged as {address}</p>
@@ -27,10 +50,19 @@ const Transaction = ({ transaction }: { transaction?: any }) => {
           <p>Click to 'Invest' button</p>
         </div>
       )}
-      {isConnected && transaction && (
+
+      {sendTransaction && transaction && (
         <div style={{ textAlign: "left" }}>
           <p>Logged as {address}</p>
-          <button style={{ margin: 20, fontSize: 20, fontFamily: "Arial", padding: 20 }}>
+          <button
+            style={{
+              margin: 20,
+              fontSize: 20,
+              fontFamily: "Arial",
+              padding: 20,
+            }}
+            onClick={() => sendTransaction?.()}
+          >
             Send Transaction from DEX{" "}
           </button>
         </div>
