@@ -1,1 +1,1 @@
-export const baseWidgetUrl = "http://localhost:3000/";
+export const baseWidgetUrl = "https://mmx-widget-5fhy.vercel.app/";
