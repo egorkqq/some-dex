@@ -11,12 +11,14 @@ import {
 } from "./types";
 
 export function getRandomIntString(): string {
-  try {
-    return String(crypto.getRandomValues(new Uint32Array(1))[0]);
-  } catch {
-    // if `crypto` is not supported, fall back to Math.random
-    return String(Math.floor(Math.random() * 10000000));
-  }
+  // try {
+  //   return String(crypto.getRandomValues(new Uint32Array(1))[0]);
+  // } catch {
+  //   // if `crypto` is not supported, fall back to Math.random
+  //   return String(Math.floor(Math.random() * 10000000));
+  // }
+
+  return "3515222401270382325";
 }
 
 export const widgetDesktopWidth = 895;
@@ -25,9 +27,7 @@ export const widgetDesktopHeight = 590;
 export const minWidgetMobileWidth = 320;
 export const minWidgetMobileHeight = 667;
 
-export function normalizeConfigAndLogErrorsOnInvalidFields(
-  config: Partial<IHostConfig>
-): IHostConfig {
+export function normalizeConfigAndLogErrorsOnInvalidFields(config: Partial<IHostConfig>): IHostConfig {
   const errors: IConfigError[] = [];
   const configCopy = { ...config };
 
@@ -53,10 +53,7 @@ export function normalizeConfigAndLogErrorsOnInvalidFields(
     });
   }
 
-  if (
-    config.variant === "embedded-desktop" ||
-    config.variant === "embedded-mobile"
-  ) {
+  if (config.variant === "embedded-desktop" || config.variant === "embedded-mobile") {
     validateContainerNode(config.containerNode, config.variant);
   }
 
@@ -95,10 +92,7 @@ export function initEventListenersDict(): TEventListenerDict {
   const widgetEventTypes = Array.from(Object.values(WidgetEventTypes));
   const internalEventTypes = Array.from(Object.values(InternalEventTypes));
 
-  return [
-    ...widgetEventTypes,
-    ...internalEventTypes,
-  ].reduce<TEventListenerDict>(
+  return [...widgetEventTypes, ...internalEventTypes].reduce<TEventListenerDict>(
     (listenersDict: TEventListenerDict, eventType: TAllEventTypes) => {
       listenersDict[eventType] = [];
 
@@ -136,10 +130,7 @@ export function isHtmlElement(element: Element): element is HTMLElement {
   return typeof (element as any).blur === "function";
 }
 
-function validateContainerNode(
-  containerNode: HTMLElement | undefined,
-  variant: SyntheticWidgetVariants
-): void {
+function validateContainerNode(containerNode: HTMLElement | undefined, variant: SyntheticWidgetVariants): void {
   if (!document.body) {
     throw new Error("Couldn't find <body> element.");
   }
@@ -156,27 +147,19 @@ function validateContainerNode(
 
   if (variant === "embedded-desktop") {
     if (width + 1 < widgetDesktopWidth) {
-      throw new Error(
-        `Container node must be at least ${widgetDesktopWidth}px wide.`
-      );
+      throw new Error(`Container node must be at least ${widgetDesktopWidth}px wide.`);
     }
 
     if (height + 1 < widgetDesktopHeight) {
-      throw new Error(
-        `Container node must be at least ${widgetDesktopHeight}px tall.`
-      );
+      throw new Error(`Container node must be at least ${widgetDesktopHeight}px tall.`);
     }
   } else if (variant === "embedded-mobile") {
     if (width + 1 < minWidgetMobileWidth) {
-      throw new Error(
-        `Container node must be at least ${minWidgetMobileWidth}px wide.`
-      );
+      throw new Error(`Container node must be at least ${minWidgetMobileWidth}px wide.`);
     }
 
     if (height + 1 < minWidgetMobileHeight) {
-      throw new Error(
-        `Container node must be at least ${minWidgetMobileHeight}px tall.`
-      );
+      throw new Error(`Container node must be at least ${minWidgetMobileHeight}px tall.`);
     }
   }
 }
@@ -189,9 +172,7 @@ function validateContainerNode(
  * @param path path to append, e.g.: 'user/getByEmail' or '/swap'
  */
 export function concatRelativePath(base: string | URL, path: string): URL {
-  const normalizedBase = urlWithoutTrailingSlash(
-    base instanceof URL ? base.href : base
-  );
+  const normalizedBase = urlWithoutTrailingSlash(base instanceof URL ? base.href : base);
   const normalizedPath = path.startsWith("/") ? path.substr(1) : path;
   return new URL(`${normalizedBase}/${normalizedPath}`);
 }

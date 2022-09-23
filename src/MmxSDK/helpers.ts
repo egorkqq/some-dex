@@ -1,17 +1,7 @@
 import { baseWidgetUrl } from "./constants";
-import {
-  AllWidgetVariants,
-  IHostConfigWithSdkParams,
-  InternalEventTypes,
-  TAllEvents,
-} from "./types";
+import { AllWidgetVariants, IHostConfigWithSdkParams, InternalEventTypes, TAllEvents } from "./types";
 
-import {
-  minWidgetMobileHeight,
-  minWidgetMobileWidth,
-  widgetDesktopHeight,
-  widgetDesktopWidth,
-} from "./utils";
+import { minWidgetMobileHeight, minWidgetMobileWidth, widgetDesktopHeight, widgetDesktopWidth } from "./utils";
 
 export function getBaseUrl(config: IHostConfigWithSdkParams): URL {
   return new URL(config.url || baseWidgetUrl);
@@ -27,20 +17,14 @@ export function initWidgetIframeUrl(config: IHostConfigWithSdkParams): string {
 
   Object.entries(preparedConfig).forEach(([key, value]) => {
     if (value) {
-      baseUrl.searchParams.append(
-        key,
-        Array.isArray(value) ? value.join(",") : value.toString()
-      );
+      baseUrl.searchParams.append(key, Array.isArray(value) ? value.join(",") : value.toString());
     }
   });
 
   return baseUrl.toString();
 }
 
-export function hideWebsiteBelow(
-  parent: Element | ShadowRoot,
-  containerWidth?: number | undefined
-): void {
+export function hideWebsiteBelow(parent: Element | ShadowRoot, containerWidth?: number | undefined): void {
   const backgroundWebsiteHider = document.createElement("div");
   backgroundWebsiteHider.classList.add("background-hider");
 
@@ -142,11 +126,7 @@ export function initDOMNodeWithoutOverlay(
   };
 }
 
-function prepareIframeNode(
-  url: string,
-  variant: AllWidgetVariants,
-  containerNode?: HTMLElement
-): HTMLIFrameElement {
+function prepareIframeNode(url: string, variant: AllWidgetVariants, containerNode?: HTMLElement): HTMLIFrameElement {
   const iframe = document.createElement("iframe");
 
   iframe.setAttribute("src", url);
@@ -181,20 +161,14 @@ function prepareIframeNode(
     );
   }
 
-  iframe.setAttribute(
-    "allow",
-    "microphone; camera; clipboard-read; clipboard-write"
-  );
+  iframe.setAttribute("allow", "microphone; camera; clipboard-read; clipboard-write");
 
   iframe.classList.add("iframe");
 
   return iframe;
 }
 
-function prepareOverlayNode(
-  iframe: HTMLIFrameElement,
-  dispatch: (event: TAllEvents) => void
-): HTMLDivElement {
+function prepareOverlayNode(iframe: HTMLIFrameElement, dispatch: (event: TAllEvents) => void): HTMLDivElement {
   const overlay = document.createElement("div");
 
   overlay.classList.add("overlay");
@@ -214,10 +188,7 @@ function prepareOverlayNode(
   overlay.appendChild(loader);
 
   overlay.addEventListener("click", (event) => {
-    if (
-      event.target !== iframe &&
-      !overlay.querySelectorAll(".close-modal").length
-    ) {
+    if (event.target !== iframe && !overlay.querySelectorAll(".close-modal").length) {
       dispatch({
         type: InternalEventTypes.WIDGET_CLOSE_REQUEST,
         payload: null,
@@ -237,16 +208,13 @@ export function isCloseModalAlreadyOpen(containerNode: HTMLElement): boolean {
   return containerNode.querySelectorAll(".close-modal").length !== 0;
 }
 
-export function prepareCloseModalNode(
-  dispatch: (event: TAllEvents) => void
-): HTMLDivElement {
+export function prepareCloseModalNode(dispatch: (event: TAllEvents) => void): HTMLDivElement {
   const container = document.createElement("div");
   container.classList.add("close-modal");
 
   const textEl = document.createElement("div");
   textEl.classList.add("close-modal__text");
-  textEl.textContent =
-    "Are you sure you want to exit Ramp and abandon the transaction?";
+  textEl.textContent = "Are you sure you want to exit ZapFarm and abandon the transaction?";
 
   const buttonContainer = document.createElement("div");
   buttonContainer.classList.add("close-modal__button-container");
@@ -293,12 +261,8 @@ export function prepareCloseModalNode(
 function getStylesForShadowDom(variant: AllWidgetVariants): HTMLStyleElement {
   const styles = document.createElement("style");
 
-  const isMobile =
-    variant === "mobile" ||
-    variant === "hosted-mobile" ||
-    variant === "embedded-mobile";
-  const isEmbedded =
-    variant === "embedded-mobile" || variant === "embedded-desktop";
+  const isMobile = variant === "mobile" || variant === "hosted-mobile" || variant === "embedded-mobile";
+  const isEmbedded = variant === "embedded-mobile" || variant === "embedded-desktop";
 
   styles.textContent = `
 

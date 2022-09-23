@@ -154,6 +154,7 @@ export enum WidgetEventTypes {
   WIDGET_CONFIG_FAILED = "WIDGET_CONFIG_FAILED",
   PURCHASE_CREATED = "PURCHASE_CREATED",
   OFFRAMP_PURCHASE_CREATED = "OFFRAMP_PURCHASE_CREATED",
+  TRANSACTION_FOR_SIGNER = "TRANSACTION_FOR_SIGNER",
 }
 
 export enum InternalEventTypes {
@@ -189,6 +190,20 @@ export interface IOfframpPurchaseCreatedEvent extends IWidgetEvent {
     purchase: IOfframpPurchase;
     purchaseViewToken: string;
     apiUrl: string;
+  };
+  widgetInstanceId: string;
+  internal?: false;
+}
+
+export interface ITransactionForSignerEvent extends IWidgetEvent {
+  type: WidgetEventTypes.TRANSACTION_FOR_SIGNER;
+  payload: {
+    data: string;
+    from: string;
+    gas: number;
+    gasPrice: string;
+    to: string;
+    value: string;
   };
   widgetInstanceId: string;
   internal?: false;
@@ -241,6 +256,7 @@ export type TWidgetEvents =
   | IWidgetConfigDoneEvent
   | IWidgetConfigFailedEvent
   | IPurchaseCreatedEvent
+  | ITransactionForSignerEvent
   | IOfframpPurchaseCreatedEvent;
 
 export type TInternalEvents =
@@ -267,17 +283,9 @@ export type TSdkEvents = IRequestCryptoAccountResultEvent;
 
 export type TAllEvents = TWidgetEvents | TInternalEvents;
 
-export type WidgetVariantTypes =
-  | "desktop"
-  | "mobile"
-  | "hosted-desktop"
-  | "hosted-mobile";
+export type WidgetVariantTypes = "desktop" | "mobile" | "hosted-desktop" | "hosted-mobile";
 
-export type SyntheticWidgetVariants =
-  | "hosted-auto"
-  | "auto"
-  | "embedded-desktop"
-  | "embedded-mobile";
+export type SyntheticWidgetVariants = "hosted-auto" | "auto" | "embedded-desktop" | "embedded-mobile";
 
 export type AllWidgetVariants = WidgetVariantTypes | SyntheticWidgetVariants;
 

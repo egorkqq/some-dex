@@ -85,6 +85,7 @@ export class MinimaxSDK {
     });
 
     // добавляем айди инстанса виджета и какой-то коллбек если нужно
+    // ОДНАКО! Само приложение (хостед) получает инфу о widgetInstanceId из квери
     this._config = {
       ...this._rawNormalizedConfig,
       ...this._getHostConfigSdkParams(this._rawNormalizedConfig),
@@ -94,9 +95,7 @@ export class MinimaxSDK {
   // показать модалку в приложении партнера, повесить слушатели событии из
   public show(): MinimaxSDK {
     if (this._isVisible) {
-      throw new Error(
-        "Widget is already visible - you can only call this once per instance"
-      );
+      throw new Error("Widget is already visible - you can only call this once per instance");
     }
 
     if (document.activeElement && isHtmlElement(document.activeElement)) {
@@ -120,54 +119,36 @@ export class MinimaxSDK {
     return this;
   }
 
-  public on<T extends TAllEvents>(
-    type: T["type"] | "*",
-    callback: (event: T) => any
-  ): MinimaxSDK {
+  public on<T extends TAllEvents>(type: T["type"] | "*", callback: (event: T) => any): MinimaxSDK {
     this._on(type, callback, false);
 
     return this;
   }
 
-  public unsubscribe(
-    type: TAllEvents["type"] | "*",
-    callback: (event: TAllEvents) => any
-  ): MinimaxSDK {
+  public unsubscribe(type: TAllEvents["type"] | "*", callback: (event: TAllEvents) => any): MinimaxSDK {
     if (type === "*") {
       const allTypes = Object.entries(this._listeners);
 
       allTypes.forEach(([key, eventHandlers]) => {
-        const filteredHandlers = eventHandlers.filter(
-          (l) => l.callback !== callback
-        );
+        const filteredHandlers = eventHandlers.filter((l) => l.callback !== callback);
         this._listeners[key as TAllEventTypes] = filteredHandlers;
       });
     } else {
-      this._listeners[type] = this._listeners[type].filter(
-        (l) => l.callback !== callback
-      );
+      this._listeners[type] = this._listeners[type].filter((l) => l.callback !== callback);
     }
 
     return this;
   }
 
-  public _on<T extends TAllEvents>(
-    type: T["type"] | "*",
-    callback: (event: T) => any,
-    internal: boolean
-  ): void {
+  public _on<T extends TAllEvents>(type: T["type"] | "*", callback: (event: T) => any, internal: boolean): void {
     if (type !== "*" && !this._listeners[type]) {
       // tslint:disable-next-line:no-console
-      console.warn(
-        `Unknown / unsupported event name - '${type}'. This listener will have no effect.`
-      );
+      console.warn(`Unknown / unsupported event name - '${type}'. This listener will have no effect.`);
     }
 
     if (type === "*") {
       const allTypes = Object.values(this._listeners);
-      allTypes.forEach((eventHandlers) =>
-        eventHandlers.push({ callback, internal })
-      );
+      allTypes.forEach((eventHandlers) => eventHandlers.push({ callback, internal }));
     } else {
       this._listeners[type].push({ callback, internal });
     }
@@ -183,12 +164,8 @@ export class MinimaxSDK {
     return this;
   }
 
-  public onRequestCryptoAccount(
-    callback: TOnRequestCryptoAccountCallback
-  ): MinimaxSDK {
-    const onRequestCryptoAccount = async (
-      event: IRequestCryptoAccountEvent
-    ) => {
+  public onRequestCryptoAccount(callback: TOnRequestCryptoAccountCallback): MinimaxSDK {
+    const onRequestCryptoAccount = async (event: IRequestCryptoAccountEvent) => {
       let result: IOnRequestCryptoAccountResult;
       try {
         result = await callback(event.payload.type, event.payload.assetSymbol);
@@ -222,11 +199,7 @@ export class MinimaxSDK {
       });
     };
 
-    this._on(
-      InternalEventTypes.REQUEST_CRYPTO_ACCOUNT,
-      onRequestCryptoAccount,
-      true
-    );
+    this._on(InternalEventTypes.REQUEST_CRYPTO_ACCOUNT, onRequestCryptoAccount, true);
 
     return this;
   }
@@ -243,10 +216,7 @@ export class MinimaxSDK {
 
     const eventData = event.data as TWidgetEvents;
 
-    if (
-      !eventData.widgetInstanceId ||
-      eventData.widgetInstanceId !== this._config.widgetInstanceId
-    ) {
+    if (!eventData.widgetInstanceId || eventData.widgetInstanceId !== this._config.widgetInstanceId) {
       return;
     }
 
@@ -298,16 +268,11 @@ export class MinimaxSDK {
           return;
         }
 
-        if (
-          this._config.variant === "mobile" ||
-          isCloseModalAlreadyOpen(this.domNodes!.overlay!)
-        ) {
+        if (this._config.variant === "mobile" || isCloseModalAlreadyOpen(this.domNodes!.overlay!)) {
           return;
         }
 
-        this.domNodes!.overlay!.appendChild(
-          prepareCloseModalNode(this._dispatchEvent)
-        );
+        this.domNodes!.overlay!.appendChild(prepareCloseModalNode(this._dispatchEvent));
       },
       true
     );
@@ -346,10 +311,7 @@ export class MinimaxSDK {
       throw new Error(`Widget is not visible couldn't send the event`);
     }
     try {
-      (this.widgetWindow ?? this.domNodes?.iframe.contentWindow)?.postMessage(
-        event,
-        getBaseUrl(this._config).origin
-      );
+      (this.widgetWindow ?? this.domNodes?.iframe.contentWindow)?.postMessage(event, getBaseUrl(this._config).origin);
       // tslint:disable-next-line:no-empty
     } catch {}
   }
@@ -363,11 +325,7 @@ export class MinimaxSDK {
   private _handleEscapeClick(event: KeyboardEvent): void {
     const escKeyCode = 27;
 
-    if (
-      event.key === "Escape" ||
-      event.key === "Esc" ||
-      event.keyCode === escKeyCode
-    ) {
+    if (event.key === "Escape" || event.key === "Esc" || event.keyCode === escKeyCode) {
       this._dispatchEvent({
         type: InternalEventTypes.WIDGET_CLOSE_REQUEST,
         payload: null,
@@ -387,11 +345,7 @@ export class MinimaxSDK {
   private _showUsingEmbeddedMode(): void {
     const widgetUrl = initWidgetIframeUrl(this._config);
 
-    this.domNodes = initDOMNodeWithoutOverlay(
-      widgetUrl,
-      this._dispatchEvent,
-      this._config
-    );
+    this.domNodes = initDOMNodeWithoutOverlay(widgetUrl, this._dispatchEvent, this._config);
 
     if (!this.domNodes?.body) {
       throw new Error("Couldn't find <body> element.");
@@ -406,11 +360,7 @@ export class MinimaxSDK {
   private _showUsingOverlayMode(): void {
     const widgetUrl = initWidgetIframeUrl(this._config);
 
-    this.domNodes = initDOMNodeWithOverlay(
-      widgetUrl,
-      this._dispatchEvent,
-      this._config
-    );
+    this.domNodes = initDOMNodeWithOverlay(widgetUrl, this._dispatchEvent, this._config);
 
     if (!this.domNodes?.body) {
       throw new Error("Couldn't find <body> element.");
@@ -445,14 +395,10 @@ export class MinimaxSDK {
   }
 
   private _isConfiguredAsEmbedded(): boolean {
-    return ["embedded-desktop", "embedded-mobile"].includes(
-      this._rawNormalizedConfig.variant!
-    );
+    return ["embedded-desktop", "embedded-mobile"].includes(this._rawNormalizedConfig.variant!);
   }
 
-  private _getHostConfigSdkParams(
-    config: IHostConfig
-  ): Pick<IHostConfigWithSdkParams, "variant" | "widgetInstanceId"> {
+  private _getHostConfigSdkParams(config: IHostConfig): Pick<IHostConfigWithSdkParams, "variant" | "widgetInstanceId"> {
     const widgetVariant = determineWidgetVariant(config);
 
     return {

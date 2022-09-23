@@ -1,1 +1,1 @@
-export const baseWidgetUrl = "https://buy.ramp.network/";
+export const baseWidgetUrl = "http://localhost:3000/";
