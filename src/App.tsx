@@ -5,6 +5,8 @@ import { useState } from "react";
 import { WidgetEventTypes, ITransactionForSignerEvent } from "./MmxSDK/types";
 import { useAccount } from "wagmi";
 
+window.Buffer = window.Buffer || require("buffer").Buffer;
+
 export default function App() {
   const [transactionEvent, setTransactionEvent] = useState<ITransactionForSignerEvent>();
   const { address } = useAccount();
