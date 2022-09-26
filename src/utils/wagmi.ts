@@ -44,6 +44,9 @@ export const walletConnectConnector = new WalletConnectConnector({
   chains,
   options: {
     qrcode: true,
+    rpc: {
+      137: "https://polygon-rpc.com",
+    },
   },
 });
 
